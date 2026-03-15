@@ -3,7 +3,7 @@ import time
 import sqlite3
 import random
 
-BOT_TOKEN = "YOUR_BOT_TOKEN"
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = "937555558"
 
 POLL_INTERVAL = 8
