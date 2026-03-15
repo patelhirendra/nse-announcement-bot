@@ -9,8 +9,8 @@ import psycopg2
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = "937555558"
 
-POLL_INTERVAL = 8
-CHECK_LIMIT = 50
+POLL_INTERVAL = 60
+CHECK_LIMIT = 21
 
 # ---------------- DATABASE CONNECTION ----------------
 
