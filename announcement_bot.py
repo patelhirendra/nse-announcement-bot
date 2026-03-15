@@ -1,8 +1,10 @@
 import os
 import requests
 import time
-import sqlite3
 import random
+import psycopg2
+
+# ---------------- CONFIG ----------------
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = "937555558"
@@ -10,9 +12,16 @@ CHAT_ID = "937555558"
 POLL_INTERVAL = 8
 CHECK_LIMIT = 50
 
-# ---------------- DATABASE ----------------
+# ---------------- DATABASE CONNECTION ----------------
 
-conn = sqlite3.connect("announcements.db")
+conn = psycopg2.connect(
+    host=os.getenv("PGHOST"),
+    database=os.getenv("PGDATABASE"),
+    user=os.getenv("PGUSER"),
+    password=os.getenv("PGPASSWORD"),
+    port=os.getenv("PGPORT")
+)
+
 cursor = conn.cursor()
 
 cursor.execute("""
@@ -61,16 +70,24 @@ def send(msg):
         "text":msg
     })
 
-# ---------------- DATABASE HELPERS ----------------
+# ---------------- DATABASE FUNCTIONS ----------------
 
 def already_sent(seq):
 
-    cursor.execute("SELECT seq_id FROM announcements WHERE seq_id=?",(seq,))
+    cursor.execute(
+        "SELECT seq_id FROM announcements WHERE seq_id=%s",
+        (seq,)
+    )
+
     return cursor.fetchone()
 
 def store(seq):
 
-    cursor.execute("INSERT INTO announcements VALUES(?)",(seq,))
+    cursor.execute(
+        "INSERT INTO announcements(seq_id) VALUES(%s)",
+        (seq,)
+    )
+
     conn.commit()
 
 # ---------------- SAFE REQUEST ----------------
@@ -89,7 +106,6 @@ def safe_request(url):
                 return r.json()
 
         except Exception as e:
-
             print("Request failed:",e)
 
         try:
@@ -125,6 +141,10 @@ def get_price(symbol):
 
     return "NA","NA"
 
+# ---------------- START MESSAGE ----------------
+
+send("✅ NSE Announcement Bot Started")
+
 # ---------------- MAIN LOOP ----------------
 
 while True:
@@ -156,13 +176,17 @@ while True:
 
             company=ann["sm_name"]
             symbol=ann["symbol"]
-            details=ann["desc"]
+            subject=ann.get("desc","")
+            details=ann.get("attchmntText","")
             broadcast=ann["an_dt"]
             pdf=ann["attchmntFile"]
 
+            if details=="":
+                details=subject
+
             price,change=get_price(symbol)
 
-            important=any(k in details.lower() for k in important_keywords)
+            important=any(k in subject.lower() for k in important_keywords)
 
             label=""
             if important:
@@ -176,6 +200,9 @@ while True:
 
 💰 Price: ₹{price}
 📈 Change: {change}%
+
+📌 Subject:
+{subject}
 
 📝 Details:
 {details}
