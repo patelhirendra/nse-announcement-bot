@@ -95,6 +95,8 @@ def get_alert_type(text):
 
     if "dividend" in text:
         return "💰 DIVIDEND ALERT"
+    if "contract" in text:
+        return "📜 CONTRACT ALERT"
     if "bonus" in text:
         return "🎁 BONUS ALERT"
     if "split" in text:
