@@ -7,7 +7,7 @@ import psycopg2
 # ---------------- CONFIG ----------------
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-CHAT_ID = "555092712"
+CHAT_ID = "937555558"
 
 POLL_INTERVAL = 60
 CHECK_LIMIT = 25
