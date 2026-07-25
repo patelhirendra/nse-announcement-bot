@@ -21,7 +21,7 @@ NSE_HEADERS = {
     "Referer": "https://www.nseindia.com/",
 }
 
-# Fast Regex Matcher
+# Fast Keyword Mapping
 KEYWORDS = {
     r"\bdividend\b": "💰 DIVIDEND ALERT",
     r"\bcontract\b": "📜 CONTRACT ALERT",
@@ -34,7 +34,19 @@ KEYWORDS = {
     r"\b(merger|acquisition)\b": "🤝 MERGER / ACQUISITION ALERT",
     r"\bfund raising\b": "💸 FUND RAISING ALERT",
 }
-REGEX_PATTERN = re.compile("|".join(f"(?P<{k.strip('()|')}> {k})" for k in KEYWORDS.keys()), re.IGNORECASE)
+
+# Pre-compile individual patterns into a tuple for blazingly fast checks
+COMPILED_PATTERNS = [
+    (re.compile(pattern, re.IGNORECASE), label) 
+    for pattern, label in KEYWORDS.items()
+]
+
+def detect_alert_type(text: str) -> str | None:
+    """Check pre-compiled regexes against text."""
+    for pattern, label in COMPILED_PATTERNS:
+        if pattern.search(text):
+            return label
+    return None
 
 # ---------------- STATE MANAGEMENT ----------------
 
