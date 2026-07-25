@@ -12,7 +12,7 @@ STATE_FILE = "seen_seqs.json"
 MAX_SEEN_CACHE = 1000  # Keep memory footprint tiny
 
 POLL_INTERVAL = 30  # Seconds between checks
-CHECK_LIMIT = 25
+CHECK_LIMIT = 50
 
 NSE_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -113,7 +113,7 @@ async def main():
         except Exception as e:
             print(f"Initial handshake warning: {e}")
 
-        await send_telegram(client, "✅ <b>NSE Announcement Bot Running (Async Engine)</b>")
+        await send_telegram(client, "✅ <b>NSE Announcement Bot Started</b>")
 
         while True:
             try:
